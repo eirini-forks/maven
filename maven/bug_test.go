@@ -17,19 +17,29 @@
 package maven_test
 
 import (
+	"path/filepath"
 	"testing"
 
+	"github.com/buildpacks/libcnb"
+	. "github.com/onsi/gomega"
 	"github.com/sclevine/spec"
-	"github.com/sclevine/spec/report"
+
+	"github.com/paketo-buildpacks/maven/v6/maven"
 )
 
-func TestUnit(t *testing.T) {
-	suite := spec.New("maven", spec.Report(report.Terminal{}))
-	suite("Build", testBuild)
-	suite("Detect", testDetect)
-	suite("BugDetect", testBugDetect)
-	suite("MavenManagers", testMavenManager)
-	suite("Distribution", testDistribution)
-	suite("MvndDistribution", testMvndDistribution)
-	suite.Run(t)
+func testBugDetect(t *testing.T, context spec.G, it spec.S) {
+	var (
+		Expect = NewWithT(t).Expect
+
+		ctx    libcnb.DetectContext
+		detect maven.Detect
+	)
+
+	it.Before(func() {
+		ctx.Application.Path = filepath.Join("maven", "testdata", "nodejs-app")
+	})
+
+	it("does not detect the nodejs app", func() {
+		Expect(detect.Detect(ctx)).To(Equal(libcnb.DetectResult{}))
+	})
 }
